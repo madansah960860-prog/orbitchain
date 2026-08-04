@@ -1,0 +1,1023 @@
+/* ============================================================
+   GLASS — the material
+   Lit from above like a machined bevel. Used only where there is
+   genuinely something behind it worth blurring: over the ambient
+   field, over product photography, over the scrolling page. On a
+   flat backdrop we use .panel (solid) instead.
+   ============================================================ */
+
+.glass {
+  position: relative;
+  background: var(--glass-fill);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-3);
+  box-shadow: var(--glass-bevel), var(--glass-under), var(--glass-drop);
+}
+
+/* A thin specular streak that travels the top edge — the highlight
+   you get on a chamfered aluminium lip. */
+.glass--lit::before {
+  content: '';
+  position: absolute;
+  inset-inline: 12%;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  pointer-events: none;
+}
+
+.glass--flush {
+  border-radius: 0;
+  border-inline: 0;
+}
+
+/* Solid alternative for backgrounds with nothing behind them. */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-3);
+  box-shadow: var(--glass-bevel);
+}
+
+@supports not (backdrop-filter: blur(4px)) {
+  .glass {
+    background: color-mix(in oklch, var(--surface) 92%, transparent);
+  }
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+  --btn-bg: transparent;
+  --btn-ink: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55em;
+  min-height: 44px;
+  padding: 0.72rem 1.35rem;
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  border-radius: var(--r-pill);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform var(--d-snap) var(--e-out),
+    background-color var(--d-base) var(--e-out),
+    border-color var(--d-base) var(--e-out),
+    box-shadow var(--d-base) var(--e-out);
+}
+
+.btn:active {
+  transform: scale(0.975);
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn--primary {
+  --btn-bg: var(--primary);
+  --btn-ink: #fff;
+  box-shadow:
+    var(--glass-bevel),
+    0 10px 30px -10px oklch(0.52 0.17 245 / 0.7);
+}
+
+.btn--primary:hover:not(:disabled) {
+  --btn-bg: var(--primary-lift);
+  box-shadow:
+    var(--glass-bevel),
+    0 14px 38px -10px oklch(0.52 0.17 245 / 0.85);
+}
+
+.btn--glass {
+  background: var(--glass-fill);
+  backdrop-filter: blur(14px) saturate(1.5);
+  -webkit-backdrop-filter: blur(14px) saturate(1.5);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-bevel);
+}
+
+.btn--glass:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.1);
+  border-color: rgb(255 255 255 / 0.18);
+}
+
+.btn--ghost {
+  color: var(--muted);
+  padding-inline: 0.75rem;
+}
+
+.btn--ghost:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.btn--danger {
+  --btn-bg: var(--danger-fill);
+  --btn-ink: #fff;
+}
+
+.btn--lg {
+  min-height: 52px;
+  padding: 0.95rem 1.9rem;
+  font-size: var(--t-body);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--icon {
+  min-width: 44px;
+  padding: 0.6rem;
+  border-radius: var(--r-pill);
+}
+
+/* ============================================================
+   BADGES / PILLS
+   Never colour alone — each carries text, and stock state carries
+   a distinct dot shape as well.
+   ============================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.28rem 0.62rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border-radius: var(--r-1);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: rgb(255 255 255 / 0.03);
+  white-space: nowrap;
+}
+
+.badge--accent {
+  background: var(--accent);
+  color: oklch(0.16 0.02 62);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.badge--in {
+  color: var(--success);
+  border-color: color-mix(in oklch, var(--success) 35%, transparent);
+}
+
+.badge--low {
+  color: var(--warn);
+  border-color: color-mix(in oklch, var(--warn) 35%, transparent);
+}
+
+.badge--out {
+  color: var(--muted-dim);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.dot--low {
+  border-radius: 1px; /* square: distinguishable without colour */
+}
+
+.dot--out {
+  border-radius: 50%;
+  background: none;
+  border: 1.5px solid currentColor;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  transition: background-color var(--d-base) var(--e-out);
+}
+
+.header__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+  min-height: 68px;
+  padding-inline: var(--gutter);
+  border-radius: 0;
+  border-inline: 0;
+  border-top: 0;
+}
+
+.header__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  text-decoration: none;
+  flex: none;
+}
+
+.header__logo svg {
+  color: var(--primary-ink);
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-inline-end: auto;
+}
+
+.header__link {
+  position: relative;
+  padding: 0.55rem 0.7rem;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: var(--r-2);
+  transition: color var(--d-snap) var(--e-out);
+}
+
+.header__link:hover,
+.header__link[aria-current='page'] {
+  color: var(--ink);
+}
+
+.header__link[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 0.8rem;
+  right: 0.8rem;
+  bottom: 0.28rem;
+  height: 1.5px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: none;
+}
+
+.cart-btn {
+  position: relative;
+}
+
+.cart-btn__count {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  min-width: 19px;
+  height: 19px;
+  padding-inline: 4px;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: oklch(0.16 0.02 62);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  border: 2px solid var(--bg);
+}
+
+.header__burger {
+  display: none;
+}
+
+/* The nav has five items plus About; below this it wraps to two lines
+   and the bar grows. Hand over to the drawer before that happens. */
+@media (max-width: 1080px) {
+  .header__nav {
+    display: none;
+  }
+  .header__burger {
+    display: inline-flex;
+  }
+  .header__logo {
+    margin-inline-end: auto;
+  }
+}
+
+/* Mobile drawer */
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.drawer__scrim {
+  position: fixed;
+  inset: 0;
+  background: oklch(0.05 0 0 / 0.72);
+  backdrop-filter: blur(3px);
+  border: 0;
+  z-index: -1;
+}
+
+.drawer__panel {
+  margin: var(--s-3);
+  padding: var(--s-5);
+  align-self: start;
+  max-height: calc(100dvh - 2 * var(--s-3));
+  overflow-y: auto;
+}
+
+.drawer__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 0.25rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.drawer__link:last-of-type {
+  border-bottom: 0;
+}
+
+/* ============================================================
+   ANNOUNCEMENT / DISCLOSURE STRIP
+   The independent-reseller statement. Present on every page — it is
+   an Apple-trademark requirement and a trust signal, not clutter.
+   ============================================================ */
+
+.disclosure-strip {
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--muted);
+  font-size: var(--t-xs);
+  text-align: center;
+  padding: 0.5rem var(--gutter);
+  letter-spacing: 0.01em;
+}
+
+.disclosure-strip strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ============================================================
+   PRODUCT CARD
+   Cards genuinely are the right affordance for a catalogue grid.
+   What stops them reading as an identical-card wall: the featured
+   row spans two columns, imagery is the dominant element, and the
+   compatibility line differs meaningfully per item.
+   ============================================================ */
+
+.grid-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+  gap: var(--s-5);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--r-3);
+  background: var(--glass-fill);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-bevel), var(--glass-under);
+  transition:
+    transform var(--d-base) var(--e-out),
+    border-color var(--d-base) var(--e-out),
+    box-shadow var(--d-base) var(--e-out);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgb(255 255 255 / 0.17);
+  box-shadow:
+    var(--glass-bevel),
+    var(--glass-under),
+    0 28px 60px -24px oklch(0.05 0 0 / 0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover {
+    transform: none;
+  }
+}
+
+.card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--d-settle) var(--e-out);
+}
+
+.card:hover .card__media img {
+  transform: scale(1.045);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover .card__media img {
+    transform: none;
+  }
+}
+
+/* Reserve the top-right corner for the wishlist button so flags can
+   never run underneath it. */
+.card__flags {
+  position: absolute;
+  top: var(--s-3);
+  left: var(--s-3);
+  max-width: calc(100% - 62px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  z-index: var(--z-raised);
+}
+
+/* Flags sit on top of photography that may be white, orange or black.
+   A plain translucent badge disappears on the light ones — these get
+   their own dark backing regardless of what is behind them. */
+.card__flags .badge {
+  background: oklch(0.12 0 0 / 0.72);
+  backdrop-filter: blur(10px) saturate(1.4);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  border-color: rgb(255 255 255 / 0.16);
+  color: var(--ink);
+}
+
+.card__flags .badge--accent {
+  background: var(--accent);
+  color: oklch(0.16 0.02 62);
+  border-color: transparent;
+}
+
+.card__wish {
+  position: absolute;
+  top: var(--s-3);
+  right: var(--s-3);
+  z-index: var(--z-raised);
+  width: 44px; /* touch-target floor — do not shrink for looks */
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: oklch(0.12 0 0 / 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  transition:
+    color var(--d-snap) var(--e-out),
+    background-color var(--d-snap) var(--e-out);
+}
+
+.card__wish[aria-pressed='true'] {
+  color: var(--danger);
+}
+
+.card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.42rem;
+  padding: var(--s-4);
+  flex: 1;
+}
+
+.card__brand {
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--muted-dim);
+  letter-spacing: 0.02em;
+}
+
+.card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.card__title a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* The whole card is the hit target, but only the title is the link —
+   keeps the accessible name clean and the wishlist button clickable. */
+.card__title a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.card__fit {
+  font-size: var(--t-xs);
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.card__foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-top: auto;
+  padding-top: var(--s-3);
+}
+
+.price {
+  font-family: var(--font-mono);
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.price--was {
+  font-size: var(--t-xs);
+  font-weight: 400;
+  color: var(--muted-dim);
+  text-decoration: line-through;
+  margin-inline-start: 0.4rem;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--muted);
+}
+
+.rating svg {
+  color: var(--accent);
+}
+
+/* ============================================================
+   FORMS
+   ============================================================ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field__label {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.field__hint {
+  font-size: var(--t-xs);
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.field__error {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--t-xs);
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 0.7rem 0.9rem;
+  background: oklch(0.08 0 0 / 0.55);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  color: var(--ink);
+  font-size: var(--t-body);
+  transition:
+    border-color var(--d-snap) var(--e-out),
+    background-color var(--d-snap) var(--e-out);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--muted-dim); /* 4.8:1 — placeholders are text too */
+}
+
+.input:hover,
+.select:hover,
+.textarea:hover {
+  border-color: var(--surface-3);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--primary-ink);
+  background: oklch(0.08 0 0 / 0.8);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a0a4ab' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  padding-inline-end: 2.4rem;
+}
+
+.select option {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.checkbox-row input[type='checkbox'],
+.checkbox-row input[type='radio'] {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 0.12rem;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--s-4);
+}
+
+.form-grid > .span-2 {
+  grid-column: 1 / -1;
+}
+
+/* ============================================================
+   NOTICES
+   ============================================================ */
+
+.notice {
+  display: flex;
+  gap: 0.8rem;
+  padding: var(--s-4);
+  border-radius: var(--r-2);
+  border: 1px solid var(--line);
+  background: rgb(255 255 255 / 0.03);
+  font-size: var(--t-sm);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.notice svg {
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+.notice strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.notice--info svg {
+  color: var(--primary-ink);
+}
+.notice--warn {
+  border-color: color-mix(in oklch, var(--warn) 30%, transparent);
+}
+.notice--warn svg {
+  color: var(--warn);
+}
+.notice--danger {
+  border-color: color-mix(in oklch, var(--danger) 40%, transparent);
+  background: color-mix(in oklch, var(--danger) 8%, transparent);
+}
+.notice--danger svg {
+  color: var(--danger);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.footer {
+  margin-top: var(--section);
+  border-top: 1px solid var(--line-soft);
+  background: var(--bg-deep);
+}
+
+/* auto-fit with a 220px first column forced a 640px minimum and pushed
+   the page sideways on a phone. Explicit breakpoints instead. */
+.footer__top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-6) var(--s-5);
+  padding-block: var(--s-8) var(--s-6);
+}
+
+@media (min-width: 34rem) {
+  .footer__top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .footer__col:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 60rem) {
+  .footer__top {
+    grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
+  }
+  .footer__col:first-child {
+    grid-column: auto;
+  }
+}
+
+.footer__col h3 {
+  font-size: var(--t-xs);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-dim);
+  margin-bottom: var(--s-3);
+}
+
+.footer__col ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.footer__col a {
+  font-size: var(--t-sm);
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.footer__col a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.footer__bottom {
+  border-top: 1px solid var(--line-soft);
+  padding-block: var(--s-5) var(--s-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--t-xs);
+  color: var(--muted-dim);
+}
+
+.footer__legal {
+  max-width: 62ch;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   COOKIE CONSENT
+   ============================================================ */
+
+/* Anchored bottom-right on desktop so it never sits over the hero's
+   primary CTA; full width only where there is no room to avoid it. */
+.consent {
+  position: fixed;
+  right: var(--s-4);
+  bottom: var(--s-4);
+  z-index: var(--z-toast);
+  width: min(26rem, calc(100vw - 2 * var(--s-4)));
+  padding: var(--s-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+@media (max-width: 560px) {
+  .consent {
+    left: var(--s-3);
+    right: var(--s-3);
+    bottom: var(--s-3);
+    width: auto;
+  }
+}
+
+.consent__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.consent__actions .btn {
+  flex: 1 1 auto;
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+.toast-region {
+  position: fixed;
+  top: 84px;
+  right: var(--s-4);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.8rem 1.1rem;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  max-width: 22rem;
+}
+
+.toast svg {
+  color: var(--success);
+  flex: none;
+}
+
+/* ============================================================
+   TABLES (spec sheets, order summaries)
+   ============================================================ */
+
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-sm);
+}
+
+.spec-table th,
+.spec-table td {
+  text-align: left;
+  padding: 0.72rem 0;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+}
+
+.spec-table th {
+  font-weight: 500;
+  color: var(--muted);
+  width: 42%;
+  padding-inline-end: var(--s-4);
+}
+
+.spec-table td {
+  color: var(--ink);
+}
+
+.spec-table tr:last-child th,
+.spec-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ============================================================
+   PROSE (policy pages)
+   ============================================================ */
+
+.prose {
+  color: var(--muted);
+  line-height: 1.72;
+}
+
+.prose h2 {
+  color: var(--ink);
+  font-size: clamp(1.35rem, 1.1rem + 1vw, 1.85rem);
+  margin-block: var(--s-7) var(--s-3);
+}
+
+.prose h3 {
+  color: var(--ink);
+  font-size: 1.1rem;
+  margin-block: var(--s-5) var(--s-2);
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin-block: var(--s-3);
+}
+
+.prose li {
+  margin-block: 0.4rem;
+}
+
+.prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Wide spec tables scroll inside their own container rather than
+   widening the page. The wrapper keeps the table's semantics intact
+   (changing the table's own display would strip them). */
+.table-scroll {
+  overflow-x: auto;
+  margin-block: var(--s-4);
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose table {
+  width: 100%;
+  min-width: 30rem;
+  border-collapse: collapse;
+  margin-block: var(--s-4);
+  font-size: var(--t-sm);
+}
+
+.table-scroll > table {
+  margin-block: 0;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--line-soft);
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+}
+
+.prose th {
+  background: rgb(255 255 255 / 0.03);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* A token the merchant must replace before running ads. Deliberately
+   loud so it cannot ship unnoticed. */
+.token {
+  display: inline;
+  padding: 0.05em 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 600;
+  color: oklch(0.16 0.02 62);
+  background: var(--accent);
+  border-radius: var(--r-1);
+}

@@ -1,0 +1,30 @@
+{
+  "name": "orbit-chain",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "prebuild": "node scripts/check-images.mjs && node scripts/optimize-images.mjs && node scripts/sitemap.mjs",
+    "check": "node scripts/check-images.mjs",
+    "check:ads": "node scripts/check-ad-copy.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "sitemap": "node scripts/sitemap.mjs",
+    "images": "node scripts/optimize-images.mjs",
+    "fonts": "node scripts/fetch-fonts.mjs"
+  },
+  "dependencies": {
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "sharp": "^0.35.3",
+    "vite": "^5.4.11"
+  }
+}

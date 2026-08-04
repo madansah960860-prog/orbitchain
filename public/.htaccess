@@ -1,0 +1,212 @@
+# ==============================================================
+#  Orbit Chain Co. — Apache configuration
+#
+#  This file is copied verbatim into dist/ by the Vite build, so
+#  upload the CONTENTS of dist/ to your web root and this ships
+#  with it.
+#
+#  Deploying into a SUBFOLDER (e.g. example.com/shop/)?
+#    1. set `base: '/shop/'` in vite.config.js
+#    2. uncomment the RewriteBase line in section 2
+#    3. change the fallback to /shop/index.html
+# ==============================================================
+
+# --------------------------------------------------------------
+# 0. Directory behaviour
+# --------------------------------------------------------------
+Options -Indexes +FollowSymLinks
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# --------------------------------------------------------------
+# 1. Canonical host + HTTPS
+#    One canonical URL per page keeps Google Ads' destination
+#    checks and your analytics honest. Runs BEFORE the SPA
+#    fallback so redirects resolve on the real URL.
+#
+#    Using HTTP_HOST rather than a hardcoded domain, so this
+#    works on staging without edits. To force a specific host,
+#    replace %{HTTP_HOST} with your domain in the www rule.
+# --------------------------------------------------------------
+
+# Force HTTPS (skip if your host terminates TLS at a proxy and
+# already sets X-Forwarded-Proto — the second condition handles that)
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteCond %{REQUEST_URI} !^/\.well-known/
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Force www. (comment this block out if you prefer the bare domain)
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteCond %{HTTP_HOST} !^localhost [NC]
+RewriteCond %{HTTP_HOST} !^\d+\.\d+\.\d+\.\d+$
+RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Strip trailing slashes from non-directory URLs (/shop/ -> /shop)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^(.+)/$
+RewriteRule ^ %1 [R=301,L]
+
+# --------------------------------------------------------------
+# 2. Legacy / renamed paths
+#    Add 301s here as the catalog changes so old ad links and
+#    indexed URLs never land on a 404.
+# --------------------------------------------------------------
+# RewriteBase /
+
+RewriteRule ^products/?$              /shop [R=301,L]
+RewriteRule ^collections/?$           /shop [R=301,L]
+RewriteRule ^category/(.+)$           /shop/$1 [R=301,L]
+RewriteRule ^p/(.+)$                  /product/$1 [R=301,L]
+RewriteRule ^privacy-policy/?$        /privacy [R=301,L]
+RewriteRule ^terms-and-conditions/?$  /terms [R=301,L]
+RewriteRule ^terms-of-service/?$      /terms [R=301,L]
+RewriteRule ^refund-policy/?$         /returns [R=301,L]
+RewriteRule ^return-policy/?$         /returns [R=301,L]
+RewriteRule ^shipping-policy/?$       /shipping [R=301,L]
+RewriteRule ^contact-us/?$            /contact [R=301,L]
+RewriteRule ^about-us/?$              /about [R=301,L]
+
+# House brand renamed Ampere -> Orbit. Two product slugs moved with it;
+# this covers them and anything else that carried the old prefix.
+RewriteRule ^product/ampere-(.+)$     /product/orbit-$1 [R=301,L]
+
+# --------------------------------------------------------------
+# 3. SPA FALLBACK  ← the rule that stops refreshes 404ing
+#
+#    React Router owns /shop, /product/:slug, /checkout and the
+#    rest. Those paths do not exist on disk, so without this a
+#    hard refresh or a pasted deep link returns Apache's 404.
+#
+#    Anything that IS a real file or directory is served
+#    normally — so /assets/*.js, /images/*.jpg and robots.txt
+#    are untouched, and a genuinely missing image still returns
+#    a real 404 rather than the HTML shell.
+# --------------------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteCond %{REQUEST_URI} !^/(assets|images)/
+RewriteRule . /index.html [L]
+</IfModule>
+
+# --------------------------------------------------------------
+# 4. Error documents
+#    The rewrite above catches unknown ROUTES and hands them to
+#    React Router, which renders the styled 404 page. This only
+#    catches what the rewrite deliberately skipped.
+# --------------------------------------------------------------
+ErrorDocument 403 /index.html
+ErrorDocument 404 /index.html
+
+# --------------------------------------------------------------
+# 5. Compression
+# --------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript text/javascript
+  AddOutputFilterByType DEFLATE application/json application/xml application/rss+xml
+  AddOutputFilterByType DEFLATE image/svg+xml application/vnd.ms-fontobject
+  AddOutputFilterByType DEFLATE font/ttf font/otf font/woff font/woff2
+</IfModule>
+
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css text/javascript
+  AddOutputFilterByType BROTLI_COMPRESS application/javascript application/json
+  AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
+# --------------------------------------------------------------
+# 6. Caching
+#    Vite fingerprints everything in /assets, so those are safe
+#    to cache for a year. index.html must NEVER be cached, or
+#    visitors keep loading a stale app shell after a deploy.
+# --------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault                          "access plus 1 month"
+  ExpiresByType text/html                 "access plus 0 seconds"
+  ExpiresByType text/css                  "access plus 1 year"
+  ExpiresByType application/javascript    "access plus 1 year"
+  ExpiresByType image/jpeg                "access plus 6 months"
+  ExpiresByType image/png                 "access plus 6 months"
+  ExpiresByType image/webp                "access plus 6 months"
+  ExpiresByType image/avif                "access plus 6 months"
+  ExpiresByType image/svg+xml             "access plus 6 months"
+  ExpiresByType font/woff2                "access plus 1 year"
+  ExpiresByType application/xml           "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2?|ttf|otf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(jpg|jpeg|png|webp|avif|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=15552000"
+  </FilesMatch>
+  <FilesMatch "^(index\.html|sitemap\.xml|robots\.txt)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+
+# --------------------------------------------------------------
+# 7. Security headers
+# --------------------------------------------------------------
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(self)"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+
+  # Content Security Policy.
+  #
+  # 'unsafe-inline' on style-src is required by React's inline style
+  # attributes. Add your payment provider's domains to script-src,
+  # frame-src and connect-src when you wire up a real gateway.
+  #
+  # NOTE: index.html contains an inline <script type="application/ld+json">
+  # block of structured data. Current browsers treat that as a data block
+  # rather than executable script, so script-src 'self' does not stop it.
+  # If Google Search Console ever reports the structured data as missing,
+  # this policy is the first place to look — add a nonce or a sha256 hash
+  # for that block rather than opening up script-src wholesale.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+
+  Header unset X-Powered-By
+  Header always unset Server
+</IfModule>
+
+# --------------------------------------------------------------
+# 8. MIME types
+# --------------------------------------------------------------
+<IfModule mod_mime.c>
+  AddType application/javascript          .js .mjs
+  AddType text/css                        .css
+  AddType image/svg+xml                   .svg
+  AddType image/webp                      .webp
+  AddType image/avif                      .avif
+  AddType font/woff2                      .woff2
+  AddType application/manifest+json       .webmanifest
+  AddCharset UTF-8                        .html .css .js .json .svg .xml
+</IfModule>
+
+# --------------------------------------------------------------
+# 9. Block access to dotfiles and source maps
+# --------------------------------------------------------------
+<FilesMatch "^\.|\.(map|env|log|bak|config|json~)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# .htaccess itself must never be readable
+<Files ".htaccess">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</Files>

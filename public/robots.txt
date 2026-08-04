@@ -1,0 +1,17 @@
+# Orbit Chain Co.
+# Replace the Sitemap host with your real domain before going live.
+
+User-agent: *
+Allow: /
+
+# Nothing useful to a crawler, and cart/checkout URLs carry state.
+Disallow: /cart
+Disallow: /checkout
+Disallow: /checkout/declined
+Disallow: /wishlist
+Disallow: /search?
+
+# Ad landing pages must stay crawlable — Google Ads checks the
+# destination URL is reachable. Do not disallow /shop or /product.
+
+Sitemap: https://www.shoporbitchain.us/sitemap.xml

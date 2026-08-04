@@ -1,0 +1,124 @@
+/* ============================================================
+   AMPERE SUPPLY CO. — design tokens
+   Scene: a precision parts counter under cold morning light.
+   Anodized aluminium, matte silicone, the click of a magnet seating.
+
+   Strategy: Committed-cool. A neutral near-black carries the shop
+   shadow, cobalt is the lamp, and a signal amber appears on <8% of
+   surface as a functional highlight (stock, cart count, flags).
+   ============================================================ */
+
+:root {
+  /* ---- surface ------------------------------------------------ */
+  --bg: oklch(0.11 0 0);
+  --bg-deep: oklch(0.075 0 0);
+  --surface: oklch(0.155 0.006 245);
+  --surface-2: oklch(0.205 0.008 245);
+  --surface-3: oklch(0.26 0.009 245);
+
+  /* ---- ink ---------------------------------------------------- */
+  --ink: oklch(0.97 0.004 245); /* 18.8:1 on --bg */
+  --muted: oklch(0.7 0.012 245); /*  7.7:1 on --bg */
+  --muted-dim: oklch(0.58 0.012 245); /*  4.8:1 on --bg — floor for body */
+  --line: oklch(0.29 0.008 245);
+  --line-soft: oklch(0.22 0.008 245);
+
+  /* ---- brand -------------------------------------------------- */
+  --primary: oklch(0.52 0.17 245); /* fills; white text = 5.5:1 */
+  --primary-lift: oklch(0.6 0.17 245); /* hover */
+  --primary-ink: oklch(0.78 0.13 240); /* links/text on dark = 10.2:1 */
+  --primary-haze: oklch(0.52 0.17 245 / 0.16);
+
+  --accent: oklch(0.85 0.16 62); /* signal amber; dark text = 12.4:1 */
+  --accent-ink: oklch(0.88 0.14 68);
+
+  --success: oklch(0.8 0.15 155);
+  --warn: oklch(0.83 0.15 85);
+  --danger: oklch(0.68 0.2 25);
+  --danger-fill: oklch(0.52 0.2 25);
+
+  /* ---- glass --------------------------------------------------
+     Glass is a material here, not a filter. Every panel is lit from
+     above: a bright 1px bevel on the top edge, a dark 1px on the
+     bottom, and a wide soft drop. Without the bevel it reads as a
+     grey box, which is the usual failure mode.                    */
+  --glass-tint: rgb(255 255 255 / 0.055);
+  --glass-tint-2: rgb(255 255 255 / 0.022);
+  --glass-fill: linear-gradient(180deg, var(--glass-tint), var(--glass-tint-2));
+  --glass-edge: rgb(255 255 255 / 0.09);
+  --glass-bevel: inset 0 1px 0 rgb(255 255 255 / 0.14);
+  --glass-under: inset 0 -1px 0 rgb(0 0 0 / 0.36);
+  --glass-drop: 0 24px 60px -22px rgb(0 0 0 / 0.75);
+  --glass-blur: 24px;
+
+  /* ---- type ---------------------------------------------------
+     Archivo is a variable grotesque with a width axis — the display
+     sizes run narrow-to-normal, spec labels run wide. Azeret Mono
+     carries SKUs, spec tables and prices: it is functional here,
+     not costume.                                                  */
+  --font-sans: 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Azeret Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --t-display: clamp(2.75rem, 1.4rem + 5.6vw, 5.5rem);
+  --t-h1: clamp(2.1rem, 1.25rem + 3.4vw, 3.75rem);
+  --t-h2: clamp(1.65rem, 1.15rem + 2vw, 2.6rem);
+  --t-h3: clamp(1.25rem, 1.05rem + 0.85vw, 1.7rem);
+  --t-lead: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  --t-body: 1rem;
+  --t-sm: 0.875rem;
+  --t-xs: 0.78rem;
+
+  --lh-tight: 1.04;
+  --lh-head: 1.14;
+  --lh-body: 1.62; /* light-on-dark gets the extra breathing room */
+
+  /* ---- space --------------------------------------------------- */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+  --s-9: 6rem;
+  --section: clamp(4rem, 2rem + 7vw, 8.5rem);
+  --gutter: clamp(1.15rem, 0.6rem + 2.4vw, 3rem);
+  --maxw: 82.5rem;
+  --maxw-prose: 68ch;
+
+  /* ---- radius -------------------------------------------------- */
+  --r-1: 6px;
+  --r-2: 10px;
+  --r-3: 16px;
+  --r-4: 24px;
+  --r-pill: 999px;
+
+  /* ---- motion --------------------------------------------------
+     Exponential ease-out only. Magnetic things snap (fast, short),
+     woven things settle (slower, longer).                          */
+  --e-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --e-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --e-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --d-snap: 180ms;
+  --d-base: 280ms;
+  --d-settle: 520ms;
+
+  /* ---- z scale (semantic, never arbitrary) ---------------------- */
+  --z-ambient: 0;
+  --z-raised: 10;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-backdrop: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-skip: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --d-snap: 1ms;
+    --d-base: 1ms;
+    --d-settle: 1ms;
+  }
+}
